@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Absensi Kamera Live</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>📷 Absensi Kamera Live</h2>
+        
+        <input type="text" id="nama" placeholder="Masukkan Nama" required><br><br>
+        
+        <div class="camera-box">
+            <video id="video" width="320" height="240" autoplay></video><br>
+        </div>
+        
+        <button onclick="ambilFoto()">📸 Ambil Foto</button>
+        
+        <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+        
+        <!-- Form untuk submit -->
+        <form id="absensiForm" method="POST" action="/proses">
+            <input type="hidden" name="image" id="image">
+            <input type="hidden" name="nama" id="namaHidden">
+        </form>
+        
+        <br>
+        <a href="/">⬅️ Kembali ke Pendaftaran</a>
+    </div>
+
+    <script>
+    // Akses kamera
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(stream) {
+            document.getElementById('video').srcObject = stream;
+        })
+        .catch(function(err) {
+            console.log("Error kamera: " + err);
+            alert("Kamera tidak dapat diakses. Pastikan izin kamera diberikan.");
+        });
+    
+    // Fungsi ambil foto
+    function ambilFoto() {
+        const namaInput = document.getElementById('nama').value;
+        
+        if (!namaInput) {
+            alert("Silahkan masukkan nama terlebih dahulu!");
+            return;
+        }
+        
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        
+        // Ambil gambar dari video
+        context.drawImage(video, 0, 0, 320, 240);
+        
+        // Konversi ke base64
+        const imageData = canvas.toDataURL('image/jpeg');
+        
+        // Isi form hidden
+        document.getElementById('image').value = imageData;
+        document.getElementById('namaHidden').value = namaInput;
+        
+        // Submit form
+        document.getElementById('absensiForm').submit();
+    }
+    </script>
+</body>
+</html>
